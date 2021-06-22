@@ -1,0 +1,93 @@
+﻿@page "/"
+
+<h1>Preco Médio</h1>
+
+<p>Adicione os valores para calcular o preço médio.</p>
+
+<EditForm class="" Model="@Compra" OnValidSubmit="@AdicionarCompra">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row">
+
+        <div class="form-group col-2">
+            <label for="@Compra.NomeAcao">Nome Ação</label>
+            <InputText class="form-control" @bind-Value="@Compra.NomeAcao" />
+        </div>
+
+        <div class="form-group col-2">
+            <label for="@Compra.DataCompra">Data Compra</label>
+            <InputDate class="form-control" @bind-Value="@Compra.DataCompra" />
+        </div>
+
+        <div class="form-group col-2">
+            <label for="@Compra.Quantidade">Quantidade</label>
+            <InputNumber class="form-control" @bind-Value="@Compra.Quantidade" />
+        </div>
+
+        <div class="form-group col-2">
+            <label for="@Compra.PrecoCompra">Preço Compra</label>
+            <InputText class="form-control" @bind-Value="@Compra.PrecoCompra" />
+        </div>
+
+        <div class="btn-group col-2">
+            <button class="btn btn-primary btn-block" type="submit">Submit</button>
+        </div>
+    </div>
+</EditForm>
+<hr />
+@if (Calculadora != null)
+{
+    <h5>Valor Total: @Calculadora.TotalCompra</h5>
+    <h5>Quantidade Total: @Calculadora.Quantidade</h5>
+    <h5>Preço Medio: @Calculadora.PrecoMedio.ToString("C2")</h5>
+}
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Data da Compra</th>
+            <th>Quantidade</th>
+            <th>Preço</th>
+            <th>Total Compra</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var compra in Compras)
+        {
+            <tr>
+                <td>@compra.NomeAcao</td>
+                <td>@compra.DataCompra.ToShortDateString()</td>
+                <td>@compra.Quantidade</td>
+                <td>@compra.PrecoCompra</td>
+                <td>@compra.TotalCompra()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private DateTime DataCompra;
+    private string NomeAcao;
+    private string PrecoAcao;
+    private int QuantidadeAcao;
+    private Compra Compra;
+    private List<Compra> Compras;
+    private CalculadoraPrecoMedio Calculadora;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Compras = new List<Compra>();
+        Compra = new Compra();
+    }
+
+    private void AdicionarCompra()
+    {
+        Compras.Add(new Compra(Compra.DataCompra, Compra.Quantidade, Compra.PrecoCompra, Compra.NomeAcao));
+        Calculadora = new CalculadoraPrecoMedio(Compras);
+        ShouldRender();
+    }
+}
